@@ -16,7 +16,7 @@ function getRandomString(length) {
 router.get('/', function (req, res, next) {
   let results = [];
   for (var ndx = 0; ndx < 1000; ndx++) {
-    results.push({ id: ndx + 1, name: getRandomString(30) })
+    results.push({ id: ndx + 1, name: getRandomString(30), code: getRandomString(10) })
   }
   res.send(results);
 });
