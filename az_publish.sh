@@ -10,7 +10,7 @@ export LOG_ANALYTICS_WORKSPACE=sample-api-logs
 export CONTAINERAPPS_ENVIRONMENT=sample-api-env
 CONTAINER_REGISTRY_NAME=`echo "$APP_NAME" | sed "s/[^[:alnum:]]//g"`
 
-docker build -t $DOCKERUSER/$APP_NAME:latest -f Dockerfile .
+docker build --no-cache -t $DOCKERUSER/$APP_NAME:latest -f Dockerfile .
 docker login -u $DOCKERUSER -p "$DOCKERPWD" docker.io
 docker push $DOCKERUSER/$APP_NAME:latest
 
