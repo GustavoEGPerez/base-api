@@ -1,6 +1,7 @@
 FROM node:latest
+ENV WEBAPP_URL=$WEBAPP_URL
 WORKDIR /app
 COPY . .
 RUN npm install
-EXPOSE 3000
+EXPOSE $PORT
 ENTRYPOINT ["node", "./bin/www"]

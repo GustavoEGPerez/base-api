@@ -1,18 +1,13 @@
-# PROCEDIMENTO PARA CONFIGURAR E PUBLICAR UMA NOVA VERSAO DO APP NO AZURE CONTAINER APPS
+# PROCEDIMENTO PARA CONFIGURAR O AMBIENTE AZURE PARA IMPLANTACAO DO CONTAINER APP
 
-export APP_NAME=sample-api
-export APP_NAME=sample-api
+export APP_NAME=sample-web
 export RESOURCE_GROUP=dev-labs
 export DOCKERUSER=gustavoperezyssy
 export DOCKERPWD=dckr_pat_Zo2ipzZcWb94lXfkVBqcC0oQZmE
 export LOCATION=centralus
-export LOG_ANALYTICS_WORKSPACE=sample-api-logs            
-export CONTAINERAPPS_ENVIRONMENT=sample-api-env
+export LOG_ANALYTICS_WORKSPACE=sample-logs            
+export CONTAINERAPPS_ENVIRONMENT=sample-env
 CONTAINER_REGISTRY_NAME=`echo "$APP_NAME" | sed "s/[^[:alnum:]]//g"`
-
-docker build -t $DOCKERUSER/$APP_NAME:latest -f Dockerfile .
-docker login -u $DOCKERUSER -p "$DOCKERPWD" docker.io
-docker push $DOCKERUSER/$APP_NAME:latest
 
 echo "Azure login..."
 az login --use-device-code
@@ -33,7 +28,4 @@ LOG_ANALYTICS_WORKSPACE_CLIENT_SECRET=`az monitor log-analytics workspace get-sh
 echo "Creating container application environment..."
 az containerapp env create --name $CONTAINERAPPS_ENVIRONMENT --resource-group $RESOURCE_GROUP --logs-workspace-id $LOG_ANALYTICS_WORKSPACE_CLIENT_ID --logs-workspace-key $LOG_ANALYTICS_WORKSPACE_CLIENT_SECRET --location "$LOCATION"
 
-echo "Creating container application..."
-az containerapp create --name $APP_NAME --resource-group $RESOURCE_GROUP --environment $CONTAINERAPPS_ENVIRONMENT --image docker.io/$DOCKERUSER/$APP_NAME --target-port 3000 --ingress 'external' --query configuration.ingress.fqdn
-
-echo "DONE!"
+echo "ENVIRONMENT SETUP DONE!"
