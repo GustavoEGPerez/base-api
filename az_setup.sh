@@ -1,25 +1,46 @@
-# PROCEDIMENTO PARA CONFIGURAR O AMBIENTE AZURE PARA IMPLANTACAO DO CONTAINER APP
+if [ "$1" == "" ] || [ $# -lt 2 ]
+then
+    echo "Favor informe um dos parametros abaixo: "
+    echo "   --nogroup"
+    echo "        Nao criar grupo de recursos"
+    echo "   --group"
+    echo "        Criar grupo de recursos"
+    echo "   --nolog"
+    echo "        Nao criar workspace de analise de logs"
+    echo "   --log"
+    echo "        Criar workspace de analise de logs"
+    exit 1
+fi
 
-export APP_NAME=sample-web
-export RESOURCE_GROUP=dev-labs
-export DOCKERUSER=gustavoperezyssy
-export DOCKERPWD=dckr_pat_Zo2ipzZcWb94lXfkVBqcC0oQZmE
-export LOCATION=centralus
-export LOG_ANALYTICS_WORKSPACE=sample-logs            
-export CONTAINERAPPS_ENVIRONMENT=sample-env
-CONTAINER_REGISTRY_NAME=`echo "$APP_NAME" | sed "s/[^[:alnum:]]//g"`
+# CARREGA AS VARIAVEIS DE AMBIENTE DO ARQUIVO .env 
+# LOCALIZADO NA MESMA PASTA DO SCRIPT
+export $(cat .env | xargs) 
+
+# PROCEDIMENTO PARA CONFIGURAR O AMBIENTE AZURE PARA IMPLANTACAO DO CONTAINER APP
+#CONTAINER_REGISTRY_NAME=`echo "$APP_NAME" | sed "s/[^[:alnum:]]//g"`
 
 echo "Azure login..."
 az login --use-device-code
 
-echo "Creating resource group ..."
-az group create -l $LOCATION -n $RESOURCE_GROUP
+echo "Set to subscription..."
+az account set --subscription $SUBSCRIPTION_NAME
+
+if [ "$1" == "--group" ] || [ "$2" == "--group" ]
+then
+    echo "Creating resource group ..."
+    az group create -l $LOCATION -n $RESOURCE_GROUP
+fi
 
 #echo "Creating container registry ..."
 #az acr create --resource-group $RESOURCE_GROUP --name $CONTAINER_REGISTRY_NAME --sku Basic
 
-echo "Creating log analytics workspace ..."
-az monitor log-analytics workspace create --resource-group $RESOURCE_GROUP --workspace-name $LOG_ANALYTICS_WORKSPACE
+if [ "$1" == "--log" ] || [ "$2" == "--log" ]
+then
+    echo "Creating log analytics workspace ..."
+    az monitor log-analytics workspace create --resource-group $RESOURCE_GROUP --workspace-name $LOG_ANALYTICS_WORKSPACE
+fi
+
+az provider register -n Microsoft.App --wait
 
 echo "Getting ClientID and Secred from log analytics workspace ..."
 LOG_ANALYTICS_WORKSPACE_CLIENT_ID=`az monitor log-analytics workspace show --query customerId -g $RESOURCE_GROUP -n $LOG_ANALYTICS_WORKSPACE --out tsv`

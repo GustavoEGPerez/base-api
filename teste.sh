@@ -1,2 +1,0 @@
-export WEBAPP_URL=$WEBAPP_URL 
-echo $WEBAPP_URL
